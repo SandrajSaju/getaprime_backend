@@ -32,7 +32,7 @@ const getAvailableFeatureService = async (req) => {
             throw new Error("User ID not found in request");
         }
 
-        // 2. Fetch user along with tier
+        // 1. Fetch user with tier
         const user = await AppDataSource.getRepository(User).findOne({
             where: { id: userId },
             relations: ["tier"],
@@ -42,20 +42,41 @@ const getAvailableFeatureService = async (req) => {
             throw new Error("User tier not found");
         }
 
-        // 3. Get features associated with that tier
-        const tier = await AppDataSource.getRepository(Tier).findOne({
-            where: { id: user.tier.id },
-            relations: ["features"], // Make sure Tier entity has ManyToMany with Feature
+        // 2. Define tier order
+        const tierOrder = ["Free", "Standard", "Premium"];
+        const userTierIndex = tierOrder.indexOf(user.tier.name);
+
+        // 3. Fetch all tiers up to the user’s tier (Free + Standard if user = Standard)
+        const availableTiers = await AppDataSource.getRepository(Tier).find({
+            where: tierOrder.slice(0, userTierIndex + 1).map((name) => ({ name })),
+            relations: ["features"],
         });
 
-        if (!tier) {
-            throw new Error("Tier not found");
-        }
+        // Collect all available features from these tiers
+        const availableFeatureIds = new Set(
+            availableTiers.flatMap((tier) => tier.features.map((f) => f.id))
+        );
 
-        // 4. Return features
-        return tier.features || [];
+        // 4. Fetch all features
+        const allFeatures = await AppDataSource.getRepository(Feature).find();
+
+        // 5. Mark availability
+        const featuresWithAvailability = allFeatures.map((feature) => ({
+            id: feature.id,
+            key: feature.key,
+            name: feature.name,
+            description: feature.description,
+            category: feature.category,
+            isAvailable: availableFeatureIds.has(feature.id),
+        }));
+
+        return {
+            userTier: user.tier.name,
+            features: featuresWithAvailability,
+        };
 
     } catch (error) {
+        console.log(error.message)
         throw new Error(error.message);
     }
 };
