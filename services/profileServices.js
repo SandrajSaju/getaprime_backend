@@ -183,7 +183,12 @@ const getFeatureDetailsService = async (req) => {
 
         if (!feature) return null;
 
-        return feature;
+        return {
+            id: feature.id,
+            name: feature.name,
+            description: feature.description,
+            category: feature.category,
+        };
 
     } catch (error) {
         throw new Error(error.message);
