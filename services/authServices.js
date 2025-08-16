@@ -21,6 +21,7 @@ const loginSchema = Joi.object({
 const registerUser = async (req) => {
     try {
         const { username, email, password } = req.body;
+        await registerSchema.validateAsync({ name: username, email, password });
         const userRepo = AppDataSource.getRepository(User);
 
         const existingUser = await userRepo.findOne({ where: { email } });
