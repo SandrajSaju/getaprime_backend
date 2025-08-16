@@ -216,10 +216,36 @@ const getFeatureDetailsService = async (req) => {
     }
 };
 
+const updateTierService = async (req) => {
+    try {
+        const tierId = req.body.tierId;
+        const userRepo = AppDataSource.getRepository(User);
+
+        // Find user by logged-in user ID
+        const user = await userRepo.findOne({ where: { id: req.user.id } });
+        if (!user) throw new CustomError("No User Found", 404);
+        
+        // Update tier_id
+        user.tier = { id: tierId };
+        // Save updated user
+        await userRepo.save(user);
+
+        return {
+            success: true,
+            message: "Tier updated successfully",
+            user,
+        };
+
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 module.exports = {
     getProfileService,
     getAvailableFeatureService,
     listAllFeaturesService,
     getFeatureDetailsService,
-    getAllTierWiseFeaturesService
+    getAllTierWiseFeaturesService,
+    updateTierService
 }

@@ -46,10 +46,20 @@ const getFeatureDetailsController = async (req, res, next) => {
   }
 };
 
+const updateTierController = async (req, res, next) => {
+  try {
+    const result = await profileService.updateTierService(req);
+    res.status(200).json(result);
+  } catch (error) {
+    next(new CustomError(error.message, 400));
+  }
+};
+
 module.exports = {
     getProfileController,
     getFeatureDetailsController,
     getAvailableFeaturesController,
     getAllTierWiseFeaturesController,
-    listAllFeaturesController
+    listAllFeaturesController,
+    updateTierController
 }

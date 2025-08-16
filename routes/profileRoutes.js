@@ -10,5 +10,6 @@ router.get("/list-all-features", verifyToken, profileController.listAllFeaturesC
 router.get("/tier-wise-features", verifyToken, profileController.getAllTierWiseFeaturesController);
 router.get("/get-available-features", verifyToken, profileController.getAvailableFeaturesController);
 router.get("/get-feature/:featureId", verifyToken, checkFeatureAccess, profileController.getFeatureDetailsController);
+router.post("/update-tier", verifyToken, profileController.updateTierController);
 
 module.exports = router;
