@@ -5,7 +5,7 @@ const generateUserToken = (tokenPayload) => {
         tokenPayload,
         process.env.JWT_ACCESS_SECRET,
         {
-            expiresIn: "1m",
+            expiresIn: "5m",
         }
     );
 

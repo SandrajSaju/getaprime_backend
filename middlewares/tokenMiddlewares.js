@@ -13,7 +13,6 @@ const verifyToken = async (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        console.log(error.message);
         return next(new CustomError("Invalid token", 401));
     }
 };

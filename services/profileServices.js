@@ -83,20 +83,6 @@ const getAvailableFeatureService = async (req) => {
 
 const getAllTierWiseFeaturesService = async (req) => {
     try {
-        // const tierRepository = AppDataSource.getRepository(Tier);
-        // const tiers = await tierRepository.find({
-        //     relations: ["features"], // Load features for each tier
-        //     order: { id: "ASC" } // Optional: order tiers
-        // });
-        // return tiers.map(tier => ({
-        //     tier_id: tier.id,
-        //     tier_name: tier.name,
-        //     features: tier.features.map(f => ({
-        //         feature_id: f.id,
-        //         feature_name: f.name,
-        //         description: f.description
-        //     }))
-        // }));
         const tierRepo = AppDataSource.getRepository(Tier);
         const userRepo = AppDataSource.getRepository(User);
 
@@ -152,11 +138,6 @@ const getAllTierWiseFeaturesService = async (req) => {
 
 const listAllFeaturesService = async (req) => {
     try {
-        // const featureRepo = AppDataSource.getRepository(Feature);
-        // const features = await featureRepo.find({
-        //     select: ["id", "name"],
-        // });
-        // return features
         const tierRepo = AppDataSource.getRepository(Tier);
         const tiers = await tierRepo.find({ relations: ["features"] });
 
