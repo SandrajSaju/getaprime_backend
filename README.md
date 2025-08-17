@@ -20,11 +20,8 @@ Create a .env file in the root of the project with the following content:
 PORT=4000
 JWT_ACCESS_SECRET=jwtaccesspassword
 JWT_REFRESH_SECRET=jwtrefreshpassword
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=root
-DB_NAME=getaprime_db
+
+Note: Please find the db related variables in the last mail
 ```
 Change values if needed (especially DB_USER, DB_PASSWORD, and DB_NAME) according to your PostgreSQL setup.
 
@@ -47,9 +44,10 @@ npm start
 ```
 
 6. If you need to insert data, run these sql queries in pgAdmin query tool, so you will get exactly same data as in the video demo.
-
    
 ```bash
+Note: It wont be needed if you use my cloud DB (find mail)
+
 INSERT INTO features (name, description, category, created_at) VALUES
 ('Dashboard', 'Overview of all activities', 'Core', NOW()),
 ('Profile Management', 'Edit and manage your profile', 'Core', NOW()),
