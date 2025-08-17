@@ -7,27 +7,12 @@ const checkFeatureAccess = async (req, res, next) => {
         if (!req.user) {
             throw new CustomError("Unauthorized. Please log in.", 401)
         }
-
         const featureId = Number(req.params.featureId);
 
         if (!featureId) {
             return res.status(400).json({ message: "Feature id is required." });
         }
 
-        // Step 1: Check from token payload first
-        const tokenFeatures = req.user?.tier?.features?.map(f => f.id) || [];
-        if (tokenFeatures.includes(featureId)) {
-            // But before allowing, check subscription validity
-            if (req.user.subscription_end && new Date(req.user.subscription_end) < new Date()) {
-                return res.status(403).json({
-                    message: "Your subscription has expired. Please renew or upgrade.",
-                    expired: true,
-                });
-            }
-            return next(); // ✅ Already in token, allow
-        }
-
-        // Step 2: Double check from DB (in case token is stale)
         const userRepo = AppDataSource.getRepository(User);
         const user = await userRepo.findOne({
             where: { id: req.user.id },
@@ -40,7 +25,7 @@ const checkFeatureAccess = async (req, res, next) => {
 
         // 🔥 Subscription validity check
         if (user.subscription_end && new Date(user.subscription_end) < new Date()) {
-            // Downgrade user to free tier (optional, depends on your business rule)
+            // Downgrade user to free tier
             user.tier = { id: 1 };
             user.subscription_end = null;
             await userRepo.save(user);
