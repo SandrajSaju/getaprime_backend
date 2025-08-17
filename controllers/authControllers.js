@@ -62,6 +62,7 @@ const refreshTokenController = async (req, res, next) => {
       name: user.username,
       email: user.email,
       tier: user.tier,
+      subscription_end: user.subscription_end,
     };
 
     const newAccessToken = jwt.sign(

@@ -14,6 +14,8 @@ const checkFeatureAccess = async (req, res, next) => {
             return res.status(400).json({ message: "Feature id is required." });
         }
 
+        console.log("tokenUserDetails", req.user);
+
         // Step 1: Check from token payload first
         const tokenFeatures = req.user?.tier?.features?.map(f => f.id) || [];
         if (tokenFeatures.includes(featureId)) {

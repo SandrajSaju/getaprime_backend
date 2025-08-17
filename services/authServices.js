@@ -65,6 +65,7 @@ const authenticateUser = async (email, password) => {
             name: user.username,
             email: user.email,
             tier: user.tier,
+            subscription_end: user.subscription_end,
         };
 
         const tokens = generateUserToken(tokenPayload);
