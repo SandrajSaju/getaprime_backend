@@ -16,6 +16,9 @@ const AppDataSource = new DataSource({
   synchronize: true, // For dev only! Auto creates tables
   logging: false,
   entities: [User, Feature, Tier],
+  ssl: {
+    rejectUnauthorized: false, // important for Render
+  },
 });
 
 module.exports = {
