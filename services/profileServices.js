@@ -3,6 +3,16 @@ const Feature = require("../models/Feature");
 const Tier = require("../models/Tier");
 const User = require("../models/User");
 const CustomError = require("../utils/customError");
+const nodemailer = require("nodemailer");
+
+// Setup nodemailer transporter
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "sandrajdevamangalam@gmail.com", // your Gmail
+        pass: "gxeu adsi wvhl tqtl", // NOT your Gmail password
+    },
+});
 
 const getProfileService = async (req) => {
     try {
@@ -201,15 +211,67 @@ const updateTierService = async (req) => {
     try {
         const tierId = req.body.tierId;
         const userRepo = AppDataSource.getRepository(User);
+        const tierRepo = AppDataSource.getRepository(Tier);
 
         // Find user by logged-in user ID
         const user = await userRepo.findOne({ where: { id: req.user.id } });
         if (!user) throw new CustomError("No User Found", 404);
-        
+
         // Update tier_id
         user.tier = { id: tierId };
+        // Update subscription dates
+        const subscriptionStart = new Date();
+        const subscriptionEnd = new Date();
+        subscriptionEnd.setDate(subscriptionEnd.getDate() + 30); // add 30 days
+
+        user.subscription_start = subscriptionStart;
+        user.subscription_end = subscriptionEnd;
+
         // Save updated user
-        await userRepo.save(user);
+        const updatedUser = await userRepo.save(user);
+
+        // Find tier details
+        const tier = await tierRepo.findOne({ where: { id: tierId } });
+        
+        const mailOptions = {
+            from: "GETA PRIME <alert@sandrajdevamangalam@gmail.com>",
+            to: user.email,
+            subject: "GETA PRIME - Your Tier has been Upgarded",
+            html: `<div style="font-family: Arial, sans-serif; background: #f4f4f7; padding: 40px;">
+            <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden;">
+      
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #6a11cb, #2575fc); padding: 24px; text-align: center; color: #fff;">
+            <h1 style="margin: 0; font-size: 28px;">🚀 Welcome to Your New Tier</h1>
+            </div>
+      
+            <!-- Body -->
+            <div style="padding: 32px; color: #333; line-height: 1.6;">
+                <p style="font-size: 18px;">Hi <b>${user.username}</b>,</p>
+            <p>We're excited to let you know that your <b>GETA PRIME</b> subscription has been successfully <b>upgraded</b> to a new tier.</p>
+        
+            <div style="margin: 24px 0; padding: 20px; background: #f0f4ff; border-radius: 8px; text-align: center;">
+                <h2 style="margin: 0; font-size: 22px; color: #2575fc;">Your New Tier: <span style="color:#6a11cb">${tier?.name}</span></h2>
+            </div>
+
+            <p>You now have access to all the powerful features included in this plan. 🎯</p>
+        
+            <p style="margin-top: 20px;">If you have any questions, feel free to contact our support team.</p>
+
+            <a href="https://geta-prime.com/dashboard" 
+                style="display: inline-block; margin-top: 20px; padding: 14px 28px; background: #2575fc; color: #fff; text-decoration: none; border-radius: 8px; font-size: 16px;">
+                    Go to Dashboard
+                </a>
+                </div>
+      
+            <!-- Footer -->
+            <div style="background: #f9f9f9; padding: 16px; text-align: center; font-size: 14px; color: #777;">
+                    <p style="margin: 0;">&copy; ${new Date().getFullYear()} GETA PRIME. All rights reserved.</p>
+                </div>
+            </div>
+        </div>`,
+        };
+        transporter.sendMail(mailOptions);
 
         return {
             success: true,
