@@ -42,38 +42,25 @@ const getAvailableFeatureService = async (req) => {
             throw new Error("User ID not found in request");
         }
 
-        // 1. Fetch user with tier
+        // 1. Fetch user with tier and tier features
         const user = await AppDataSource.getRepository(User).findOne({
             where: { id: userId },
-            relations: ["tier"],
+            relations: ["tier", "tier.features"],
         });
 
         if (!user || !user.tier) {
             throw new Error("User tier not found");
         }
 
-        // 2. Define tier order
-        const tierOrder = ["Free", "Standard", "Premium"];
-        const userTierIndex = tierOrder.indexOf(user.tier.name);
-
-        // 3. Fetch all tiers up to the user’s tier (Free + Standard if user = Standard)
-        const availableTiers = await AppDataSource.getRepository(Tier).find({
-            where: tierOrder.slice(0, userTierIndex + 1).map((name) => ({ name })),
-            relations: ["features"],
-        });
-
-        // Collect all available features from these tiers
-        const availableFeatureIds = new Set(
-            availableTiers.flatMap((tier) => tier.features.map((f) => f.id))
-        );
-
-        // 4. Fetch all features
+        // 2. Fetch all features
         const allFeatures = await AppDataSource.getRepository(Feature).find();
 
-        // 5. Mark availability
+        // 3. Get features available to this user
+        const availableFeatureIds = new Set(user.tier.features.map(f => f.id));
+
+        // 4. Mark availability
         const featuresWithAvailability = allFeatures.map((feature) => ({
             id: feature.id,
-            key: feature.key,
             name: feature.name,
             description: feature.description,
             category: feature.category,
