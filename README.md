@@ -32,6 +32,7 @@ Open PostgreSQL (via pgAdmin or CLI).
 Create a new database:
 ```bash
 CREATE DATABASE getaprime_db;
+Note: It wont be needed if you use my cloud DB (find mail)
 ```
 
 (Optional) If your PostgreSQL username or password is different from default (postgres / root), update them in the .env file.
