@@ -45,3 +45,7 @@ CREATE DATABASE getaprime_db;
 (Optional) If your PostgreSQL username or password is different from default (postgres / root), update them in the .env file.
 
 Tables will be auto-created by TypeORM when you run the server (synchronize: true is enabled).
+
+▶️ 5. Run the Server
+
+npm start
